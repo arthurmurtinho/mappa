@@ -1,4 +1,4 @@
-import com.myDomain.myLibrary.*;
+import cbrutius.mappa.*;
 
 Palette p;
 Grid g;

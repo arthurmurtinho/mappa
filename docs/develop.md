@@ -9,12 +9,12 @@ You are now ready to develop your library. This guide will walk you through reso
 ## Developing the library
 **Develop your library within `src/main/java/`.** Set the `package` at the top of your file to your
 own group id and library name, all together. For instance, in the example library, the group id is
-`com.myDomain` and the library name is `myLibrary`. The package is then `com.myDomain.myLibrary`.
+`com.myDomain` and the library name is `myLibrary`. The package is then `other.cbrutius.mappa`.
 These values will need to match the values input into your Gradle build file, `build.gradle.kts`.
 More on this in [Configuring the Gradle build file](#configuring-the-gradle-build-file).
 
 Intellij and Visual Studio Code will then direct you to move your code into nested folders, consistent
-with your package name. For instance, if the package is `com.myDomain.myLibrary`, the code will
+with your package name. For instance, if the package is `other.cbrutius.mappa`, the code will
 be in the folder structure `src/main/java/com/myDomain/myLibrary/`.
 
 If you would like to use Processing functionality in your library, you can do so by importing Processing core
