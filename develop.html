@@ -17,8 +17,11 @@
         <link rel="next" href="release.html">
       
       
+        
+      
+      
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
     
     
       
@@ -26,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.2a3383ac.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.618322db.min.css">
       
       
 
@@ -51,7 +54,6 @@
     
       
 
-    
     
     
   </head>
@@ -210,9 +212,14 @@
   
   
   <span class="md-ellipsis">
+    
+  
     Home
+  
+
     
   </span>
+  
   
 
       </a>
@@ -232,9 +239,14 @@
   
   
   <span class="md-ellipsis">
+    
+  
     Get Started
+  
+
     
   </span>
+  
   
 
       </a>
@@ -263,9 +275,14 @@
   
   
   <span class="md-ellipsis">
+    
+  
     Develop
+  
+
     
   </span>
+  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -276,9 +293,14 @@
   
   
   <span class="md-ellipsis">
+    
+  
     Develop
+  
+
     
   </span>
+  
   
 
       </a>
@@ -301,7 +323,9 @@
         <li class="md-nav__item">
   <a href="#developing-the-library" class="md-nav__link">
     <span class="md-ellipsis">
-      Developing the library
+      
+        Developing the library
+      
     </span>
   </a>
   
@@ -310,7 +334,9 @@
         <li class="md-nav__item">
   <a href="#resolving-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
-      Resolving dependencies
+      
+        Resolving dependencies
+      
     </span>
   </a>
   
@@ -319,7 +345,9 @@
         <li class="md-nav__item">
   <a href="#configuring-the-gradle-build-file" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuring the Gradle build file
+      
+        Configuring the Gradle build file
+      
     </span>
   </a>
   
@@ -328,7 +356,9 @@
         <li class="md-nav__item">
   <a href="#creating-examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating examples
+      
+        Creating examples
+      
     </span>
   </a>
   
@@ -337,7 +367,9 @@
         <li class="md-nav__item">
   <a href="#creating-the-release-artifacts" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating the release artifacts
+      
+        Creating the release artifacts
+      
     </span>
   </a>
   
@@ -346,7 +378,9 @@
         <li class="md-nav__item">
   <a href="#additional-documentation" class="md-nav__link">
     <span class="md-ellipsis">
-      Additional Documentation
+      
+        Additional Documentation
+      
     </span>
   </a>
   
@@ -372,9 +406,14 @@
   
   
   <span class="md-ellipsis">
+    
+  
     Release
+  
+
     
   </span>
+  
   
 
       </a>
@@ -394,9 +433,14 @@
   
   
   <span class="md-ellipsis">
+    
+  
     Troubleshooting
+  
+
     
   </span>
+  
   
 
       </a>
@@ -433,7 +477,9 @@
         <li class="md-nav__item">
   <a href="#developing-the-library" class="md-nav__link">
     <span class="md-ellipsis">
-      Developing the library
+      
+        Developing the library
+      
     </span>
   </a>
   
@@ -442,7 +488,9 @@
         <li class="md-nav__item">
   <a href="#resolving-dependencies" class="md-nav__link">
     <span class="md-ellipsis">
-      Resolving dependencies
+      
+        Resolving dependencies
+      
     </span>
   </a>
   
@@ -451,7 +499,9 @@
         <li class="md-nav__item">
   <a href="#configuring-the-gradle-build-file" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuring the Gradle build file
+      
+        Configuring the Gradle build file
+      
     </span>
   </a>
   
@@ -460,7 +510,9 @@
         <li class="md-nav__item">
   <a href="#creating-examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating examples
+      
+        Creating examples
+      
     </span>
   </a>
   
@@ -469,7 +521,9 @@
         <li class="md-nav__item">
   <a href="#creating-the-release-artifacts" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating the release artifacts
+      
+        Creating the release artifacts
+      
     </span>
   </a>
   
@@ -478,7 +532,9 @@
         <li class="md-nav__item">
   <a href="#additional-documentation" class="md-nav__link">
     <span class="md-ellipsis">
-      Additional Documentation
+      
+        Additional Documentation
+      
     </span>
   </a>
   
@@ -494,6 +550,7 @@
           
           
             <div class="md-content" data-md-component="content">
+              
               <article class="md-content__inner md-typeset">
                 
                   
@@ -509,11 +566,11 @@
 <h2 id="developing-the-library">Developing the library</h2>
 <p><strong>Develop your library within <code>src/main/java/</code>.</strong> Set the <code>package</code> at the top of your file to your
 own group id and library name, all together. For instance, in the example library, the group id is
-<code>com.myDomain</code> and the library name is <code>myLibrary</code>. The package is then <code>com.myDomain.myLibrary</code>.
+<code>com.myDomain</code> and the library name is <code>myLibrary</code>. The package is then <code>other.cbrutius.mappa</code>.
 These values will need to match the values input into your Gradle build file, <code>build.gradle.kts</code>.
 More on this in <a href="#configuring-the-gradle-build-file">Configuring the Gradle build file</a>.</p>
 <p>Intellij and Visual Studio Code will then direct you to move your code into nested folders, consistent
-with your package name. For instance, if the package is <code>com.myDomain.myLibrary</code>, the code will
+with your package name. For instance, if the package is <code>other.cbrutius.mappa</code>, the code will
 be in the folder structure <code>src/main/java/com/myDomain/myLibrary/</code>.</p>
 <p>If you would like to use Processing functionality in your library, you can do so by importing Processing core
 and referencing Processing objects from the PApplet instance. An example of how to do this is given in the
@@ -712,10 +769,11 @@ defined in <code>release.properties</code>, as a helpful automation.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": ".", "features": ["search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.select", "content.code.highlight", "content.code.annotate", "navigation.top", "navigation.footer"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.select", "content.code.highlight", "content.code.annotate", "navigation.top", "navigation.footer"], "search": "assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.f55a23d4.min.js"></script>
+      <script src="assets/javascripts/bundle.e71a0d61.min.js"></script>
       
     
   </body>
