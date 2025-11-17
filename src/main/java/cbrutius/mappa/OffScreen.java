@@ -17,13 +17,12 @@ PApplet parent;
         this.pg = parent.createGraphics(parent.width,parent.height,P3D);
     }
 
-    public void patch(Light l, Quote q) {
-        this.pg = l.parent;
-        this.pg = q.parent;
+    public void patch(PGraphics input) {
+        this.pg = input;
     }
 
     public void render () {
-        parent.image(pg,0,0);
+        this.parent.image(pg,0,0, pg.width,pg.height);
     }
 
 }

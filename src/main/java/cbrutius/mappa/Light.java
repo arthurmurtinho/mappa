@@ -1,7 +1,7 @@
 package cbrutius.mappa;
 import processing.core.*;
 
-public class Light {
+public class Light extends Generator{
     PGraphics parent;
     boolean isShowing = false;
     int index = 0;
@@ -14,9 +14,18 @@ public class Light {
     float fadeSpeed = 20;
     int count = 0;
 //    float writingColor = 255 - backgroundColor;
-
+//
     public Light(PGraphics p) {
         this.parent = p;
+        this.h = 255;
+        this.s = 255;
+        this.b = 255;
+        this.alpha = 255;
+        this.size = 50;
+    }
+
+    public Light() {
+//        this.parent = p;
         this.h = 255;
         this.s = 255;
         this.b = 255;
@@ -30,11 +39,6 @@ public class Light {
         this.b = b;
         this.alpha = alpha;
     }
-
-    public void setShowing(){
-        this.isShowing = !this.isShowing;
-    }
-
 
     public void backlight(){
         if (isShowing){
@@ -74,4 +78,6 @@ public class Light {
     public void status() {
         PApplet.println("visible: " + this.isShowing);
     }
+
+
 }

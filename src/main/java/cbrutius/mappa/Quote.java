@@ -6,7 +6,7 @@ import static processing.core.PApplet.loadStrings;
 import static processing.core.PApplet.println;
 
 
-public class Quote {
+public class Quote extends Generator {
     PGraphics parent;
     boolean isShowing = false;
     String current;
@@ -23,6 +23,13 @@ public class Quote {
         this.position = new PVector(parent.width/2, parent.height/2);
     }
 
+    public Quote(String fileName) {
+//        this.parent = p;
+        this.memory = loadStrings(new File(fileName));
+        this.current = this.memory[0];
+        this.position = new PVector(parent.width/2, parent.height/2);
+    }
+
     public void  setTextColor(int h, int s, int b) {
         this.h = h;
         this.s = s;
@@ -34,19 +41,18 @@ public class Quote {
     }
 
     public void run() {
+        this.parent.beginDraw();
+        this.parent.background(0);
         if (isShowing) {
-            this.parent.beginDraw();
+            this.parent.colorMode(PConstants.HSB);
             this.parent.fill(this.h, this.s, this.b);
             this.parent.textAlign(PConstants.CENTER, PConstants.CENTER);
             this.parent.textSize(this.size);
             this.parent.text(this.current, this.position.x, this.position.y);
-            this.parent.endDraw();
         }
+        this.parent.endDraw();
     }
 
-    public void setShowing() {
-        this.isShowing = !this.isShowing;
-    }
 
     public void status() {
         PApplet.println("visible: " + this.isShowing);
