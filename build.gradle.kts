@@ -203,6 +203,11 @@ tasks.register("buildReleaseArtifacts") {
             into("$releaseDirectory/library")
             exclude("*.DS_Store")
         }
+        println("Copy shaders...") // I added this to copy the shader folder into the library
+        copy {
+            from("src/main/shaders/")
+            into("$releaseDirectory/library/shaders")
+        }
 
         println("Copy javadoc...")
         copy {

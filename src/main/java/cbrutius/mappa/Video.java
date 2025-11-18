@@ -1,10 +1,8 @@
 package cbrutius.mappa;
 import processing.core.PApplet;
-import processing.core.PGraphics;
 import processing.video.*;
 import processing.video.Movie;
 import static java.lang.Math.ceil;
-import static processing.core.PConstants.P3D;
 
 public class Video extends Generator {
     Movie[] movies;
@@ -20,13 +18,21 @@ public class Video extends Generator {
 
     public Video(PApplet p) {
         super(p);
-        this.p = p;
         movies = new Movie[]{};
+    }
+
+    public Video(PApplet p, Movie m) {
+        super(p);
+        movies = new Movie[]{m};
+        for (int i = 0; i < this.movies.length; i++) {
+            Movie mov = movies[i];
+            mov.play();
+            mov.pause();
+        }
     }
 
     public Video(PApplet p, Movie[] movies) {
         super(p);
-//        this.p = p;
         this.movies = movies;
         for (int i = 0; i < this.movies.length; i++) {
             Movie mov = movies[i];
