@@ -7,8 +7,6 @@ import static processing.core.PApplet.println;
 
 
 public class Quote extends Generator {
-    PGraphics parent;
-    boolean isShowing = false;
     String current;
     String[] memory;
     int index = 0;
@@ -16,15 +14,10 @@ public class Quote extends Generator {
     int size = 200;
     PVector position;
 
-    public Quote(PGraphics p, String fileName) {
-        this.parent = p;
-        this.memory = loadStrings(new File(fileName));
-        this.current = this.memory[0];
-        this.position = new PVector(parent.width/2, parent.height/2);
-    }
-
-    public Quote(String fileName) {
-//        this.parent = p;
+    public Quote(PApplet p, String fileName) {
+        super(p);
+//        this.p = p;
+        this.parent = p.createGraphics(this.p.width, this.p.height, "P3D");
         this.memory = loadStrings(new File(fileName));
         this.current = this.memory[0];
         this.position = new PVector(parent.width/2, parent.height/2);

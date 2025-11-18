@@ -106,7 +106,8 @@ dependencies {
 
     // To add a dependency on a Processing library that is installed locally,
     // uncomment the line below, and replace <library folder> with the location of that library
-    // compileOnly(fileTree("$sketchbookLocation/libraries/<library folder>/library"))
+    compileOnly(fileTree("$sketchbookLocation/libraries/video/library"))
+    compileOnly(fileTree("$sketchbookLocation/libraries/keystone/library"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

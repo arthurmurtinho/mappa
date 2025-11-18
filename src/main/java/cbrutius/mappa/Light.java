@@ -2,9 +2,6 @@ package cbrutius.mappa;
 import processing.core.*;
 
 public class Light extends Generator{
-    PGraphics parent;
-    boolean isShowing = false;
-    int index = 0;
     float size;
     float h, s, b, alpha;
 //    ArrayList<Bulb> bulbs;
@@ -15,17 +12,9 @@ public class Light extends Generator{
     int count = 0;
 //    float writingColor = 255 - backgroundColor;
 //
-    public Light(PGraphics p) {
-        this.parent = p;
-        this.h = 255;
-        this.s = 255;
-        this.b = 255;
-        this.alpha = 255;
-        this.size = 50;
-    }
-
-    public Light() {
-//        this.parent = p;
+    public Light(PApplet p) {
+        super(p);
+//        this.p = p;
         this.h = 255;
         this.s = 255;
         this.b = 255;

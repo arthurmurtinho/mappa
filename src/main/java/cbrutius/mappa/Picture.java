@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import static processing.core.PConstants.P3D;
 
 public class Picture extends Generator {
-    PApplet p;
-    PGraphics parent;
     ArrayList<PImage> images;
-    boolean isShowing = false;
     int index = 0;
     boolean fade = false;
     int alpha = 255;
 
     public Picture(PApplet p, ArrayList<PImage> images, boolean vertical) {
-         this.p = p;
+         super(p);
+//         this.p = p;
          this.parent = this.p.createGraphics(this.p.width, this.p.height, P3D);
          this.images = images;
          for (PImage img : images) {
@@ -26,11 +24,12 @@ public class Picture extends Generator {
      }
 
      public Picture(PApplet p, PImage image, boolean vertical) {
-         this.p = p;
-         this.parent = this.p.createGraphics(this.p.width, this.p.height, P3D);
-         this.images = new ArrayList<>();
-         this.images.add(image);
-         for (PImage img : images) {
+        super(p);
+        this.p = p;
+        this.parent = this.p.createGraphics(this.p.width, this.p.height, P3D);
+        this.images = new ArrayList<>();
+        this.images.add(image);
+        for (PImage img : images) {
              if (vertical) {
                  img.resize(this.parent.height, this.parent.width); //we only inverse the width and height parameters
              } else {
