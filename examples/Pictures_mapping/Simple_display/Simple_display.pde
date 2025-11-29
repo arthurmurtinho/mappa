@@ -6,7 +6,8 @@ OffScreen off;
 Manager m;
 
 void setup() {
-    size(600, 400, P3D);
+    //size(600, 400, P3D);
+    fullScreen(P3D, 2);
     m = new Manager(this);
     off = new OffScreen(this,m.manage());
     PImage img = loadImage("default.png");

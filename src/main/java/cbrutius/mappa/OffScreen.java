@@ -27,12 +27,16 @@ CornerPinSurface surface;
     }
 
     public PVector getSMouse() {
+
         return surface.getTransformedMouse();
+    }
+
+    public boolean isHoovered() {
+        return surface.isMouseOver();
     }
 
     public void render () {
         this.surface.render(pg);
-//        this.parent.image(,0,0, pg.width,pg.height);
     }
 
 }

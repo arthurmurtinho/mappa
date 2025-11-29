@@ -25,11 +25,12 @@ void draw() {
 }
 void mouseClicked() {
     //v.setFade();
+    v.setPlaying();
 }
 void movieEvent(Movie m) {
   m.read();
 }
 
 void keyPressed() {
-  m.eventListener();
+  m.keyControls();
 }

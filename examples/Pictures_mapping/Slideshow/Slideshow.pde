@@ -1,11 +1,15 @@
 import cbrutius.mappa.*;
+import deadpixel.keystone.*;
 
 Picture p;
 OffScreen off;
+Manager m;
 
 void setup() {
-    size(600, 400, P3D);
-    off = new OffScreen(this);
+    //size(600, 400, P3D);
+    fullScreen(P3D, 2);
+    m =  new Manager(this);
+    off = new OffScreen(this, m.manage());
     ArrayList<PImage> imgs = new ArrayList<PImage>();
     for (int i = 1; i < 10; i++) {
         PImage img = loadImage("hands/" + i + ".png");
@@ -24,4 +28,8 @@ void draw() {
 }
 void mouseClicked() {
     p.nextImage();
+}
+
+void keyPressed() {
+    m.keyControls();
 }

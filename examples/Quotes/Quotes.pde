@@ -1,12 +1,16 @@
 import cbrutius.mappa.*;
+import deadpixel.keystone.*;
+
 
 Quote q;
 OffScreen off;
+Manager m;
 
 void setup() {
   size(600, 400, P3D);
-  off = new OffScreen(this);
-  q = new Quote("test.txt");
+  m = new Manager(this);
+  off = new OffScreen(this, m.manage());
+  q = new Quote(this,"test.txt");
   off.patch(q.output());
   q.setShowing();
   q.setSize(100);
@@ -22,4 +26,8 @@ void draw() {
 
 void mouseClicked() {
   q.setShowing();
+}
+
+void keyPressed() {
+  m.keyControls();
 }

@@ -4,6 +4,7 @@ import processing.core.PConstants;
 import java.io.File;
 import static processing.core.PApplet.loadStrings;
 import static processing.core.PApplet.println;
+import static processing.core.PConstants.P3D;
 
 
 public class Quote extends Generator {
@@ -17,8 +18,9 @@ public class Quote extends Generator {
     public Quote(PApplet p, String fileName) {
         super(p);
 //        this.p = p;
-        this.parent = p.createGraphics(this.p.width, this.p.height, "P3D");
-        this.memory = loadStrings(new File(fileName));
+        this.parent = p.createGraphics(this.p.width, this.p.height, P3D);
+//        this.memory = loadStrings(new File(fileName));
+        this.memory = p.loadStrings(fileName);
         this.current = this.memory[0];
         this.position = new PVector(parent.width/2, parent.height/2);
     }

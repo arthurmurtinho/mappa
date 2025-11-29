@@ -1,12 +1,15 @@
 import cbrutius.mappa.*;
+import deadpixel.keystone.*;
 
 Light l;
 OffScreen off;
+Manager m;
 
 void setup() {
     size(600, 400, P3D);
-    off = new OffScreen(this);
-    l = new Light();
+    m = new Manager(this);
+    off = new OffScreen(this, m.manage());
+    l = new Light(this);
     off.patch(l.output());
     l.setShowing();
     l.status();
@@ -14,11 +17,17 @@ void setup() {
 
 void draw() {
     background(0);
-    l.setColor((int)map(mouseX, 0, width, 0, 255),(int)map(mouseY, 0, height, 255, 0),255, 255);
+    if (off.isHoovered) {
+        l.setColor((int)map(off.getSMouse().x, 0, l.output().width, 0, 255),(int)map(off.getSMouse().y, 0, l.output().height, 255, 0),255, 255);
+    }
     l.backlight();
     off.render();
 }
 
 void mouseClicked() {
   l.setShowing();
+}
+
+void keyPressed() {
+  m.keyControls();
 }

@@ -19,7 +19,7 @@ public class Generator {
         this.parent = p.createGraphics(this.p.width, this.p.height, P3D);
     }
 
-    public void setShowing(){
+    public void setShowing() {
         this.isShowing = !this.isShowing;
     }
 

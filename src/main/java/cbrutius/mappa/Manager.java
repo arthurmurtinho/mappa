@@ -41,7 +41,7 @@ public class Manager {
         eventListener();
     }
 
-    public void eventListener() {
+    private void eventListener() {
         try {
             if (p.keyPressed) {
                 String key = Character.toString(p.key);
