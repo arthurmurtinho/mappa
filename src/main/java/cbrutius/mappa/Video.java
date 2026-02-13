@@ -14,7 +14,7 @@ public class Video extends Generator {
     int index = 0;
     float speed = 1;
     boolean forward = false;
-    boolean back = false;
+    boolean backward = false;
     float fadeSpeed = 20;
 
     public Video(PApplet p) {
@@ -47,8 +47,8 @@ public class Video extends Generator {
     public void show() {
         try {
             this.parent.beginDraw();
-            this.parent.background(0);
-            if (this.forward == true) {
+            this.parent.background(0, this.offscreen_alpha);
+            if (this.forward) {
                 this.fade = true;
                 if (this.alpha == 0) {
                     this.movies[this.index].pause();
@@ -58,14 +58,14 @@ public class Video extends Generator {
                     this.forward = false;
                 }
             }
-            if (this.back == true) {
+            if (this.backward == true) {
                 this.fade = true;
                 if (this.alpha == 0) {
                     this.movies[this.index].pause();
                     this.playing = false;
                     this.index--;
                     this.fade = false;
-                    this.back = false;
+                    this.backward = false;
                 }
             }
             if (this.isShowing) {
@@ -81,11 +81,11 @@ public class Video extends Generator {
         catch (NullPointerException e) {
             e.printStackTrace();
         }
-//        if (this.fade) {
-//            this.alpha -= this.fadeSpeed;
-//        } else {
-//            this.alpha += this.fadeSpeed;
-//        }
+        if (this.fade) {
+            this.alpha -= this.fadeSpeed;
+        } else {
+            this.alpha += this.fadeSpeed;
+        }
         if (this.alpha > 255) this.alpha = 255;
         if (this.alpha < 0) this.alpha = 0;
     }

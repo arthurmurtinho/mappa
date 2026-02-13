@@ -1,14 +1,15 @@
 package cbrutius.mappa;
+
+import deadpixel.keystone.CornerPinSurface;
+import deadpixel.keystone.Keystone;
 import processing.core.*;
 import static processing.core.PConstants.P3D;
-import deadpixel.keystone.*;
-
-import java.util.ArrayList;
 
 public class OffScreen  {
 PGraphics pg;
 PApplet parent;
 CornerPinSurface surface;
+boolean isShowing = true;
 
     public OffScreen(PApplet parent, Keystone ks, int w, int h) {
         this.parent = parent;
@@ -35,8 +36,14 @@ CornerPinSurface surface;
         return surface.isMouseOver();
     }
 
+    public void setShowing() {
+        this.isShowing = !this.isShowing;
+    }
+
     public void render () {
-        this.surface.render(pg);
+        if (this.isShowing) {
+            this.surface.render(pg);
+        }
     }
 
 }

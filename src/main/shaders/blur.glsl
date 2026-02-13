@@ -26,7 +26,7 @@ void main() {
   vec2 p = vertTexCoord.st;
   float numBlurPixelsPerSide = float(blurSize / 2); 
   
-  // Incremental Gaussian Coefficent Calculation (See GPU Gems 3 pp. 877 - 889)
+  // Incremental Gaussian Coefficient Calculation (See GPU Gems 3 pp. 877 - 889)
   vec3 incrementalGaussian;
   incrementalGaussian.x = 1.0 / (sqrt(2.0 * PI) * sigma);
   incrementalGaussian.y = exp(-0.5 / (sigma * sigma));

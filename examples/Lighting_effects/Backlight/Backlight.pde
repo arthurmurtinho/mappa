@@ -11,7 +11,6 @@ void setup() {
     off = new OffScreen(this, m.manage());
     l = new Light(this);
     off.patch(l.output());
-    l.setShowing();
     l.status();
 }
 

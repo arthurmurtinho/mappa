@@ -3,31 +3,29 @@ import cbrutius.mappa.*;
 import deadpixel.keystone.*;
 import processing.video.*;
 
-Video v;
-Movie mov;
 OffScreen off;
 Manager m;
+Camera c;
+boolean loop = false;
 
 void setup() {
     size(600, 400, P3D);
     m = new Manager(this);
     off = new OffScreen(this,m.manage());
-    mov = new Movie(this, "test.mp4");
-    v = new Video(this, mov);
-    off.patch(v.output());
+    c = new Camera(this);
+    off.patch(c.output());
 }
 
 void draw() {
     background(0);
-    v.show();
+    c.looper(1, loop, map(mouseX, 0, width, 100, 500), true);
     off.render();
 }
 void mouseClicked() {
-    //v.setFade();
-    v.setPlaying();
+    loop = !loop;
 }
-void movieEvent(Movie m) {
-  m.read();
+void captureEvent(Capture cap) {
+  cap.read();
 }
 
 void keyPressed() {

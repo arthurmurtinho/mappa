@@ -1,30 +1,31 @@
+import cbrutius.mappa.Video;
 import cbrutius.mappa.*;
 import deadpixel.keystone.*;
+import processing.video.*;
 
-Picture p;
 OffScreen off;
 Manager m;
+Camera c;
 
 void setup() {
-    //size(600, 400, P3D);
-    fullScreen(P3D, 2);
+    size(600, 400, P3D);
     m = new Manager(this);
     off = new OffScreen(this,m.manage());
-    PImage img = loadImage("default.png");
-    p = new Picture(this, img, false);
-    off.patch(p.output());
-    p.status();
+    c = new Camera(this);
+    off.patch(c.output());
 }
 
 void draw() {
     background(0);
-    p.show();
+    c.basicCapture();
     off.render();
 }
 void mouseClicked() {
-    p.setFade();
+}
+void captureEvent(Capture cap) {
+  cap.read();
 }
 
 void keyPressed() {
-    m.keyControls();
+  m.keyControls();
 }

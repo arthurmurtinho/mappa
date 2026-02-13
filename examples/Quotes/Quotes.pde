@@ -12,7 +12,6 @@ void setup() {
   off = new OffScreen(this, m.manage());
   q = new Quote(this,"test.txt");
   off.patch(q.output());
-  q.setShowing();
   q.setSize(100);
   q.setTextColor(255, 255, 255);
 }

@@ -9,10 +9,10 @@ basically setting visibility and routing.
  */
 
 public class Generator {
-    boolean isShowing = false;
+    boolean isShowing = true;
     PGraphics parent;
     PApplet p;
-
+    int offscreen_alpha = 0;
 
     public Generator(PApplet p){
         this.p = p;

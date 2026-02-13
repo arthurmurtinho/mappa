@@ -17,7 +17,6 @@ void setup() {
     }
     p = new Picture(this, imgs, false);
     off.patch(p.output());
-    p.setShowing();
     p.status();
 }
 
