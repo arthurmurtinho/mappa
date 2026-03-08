@@ -2,6 +2,7 @@ import cbrutius.mappa.Video;
 import cbrutius.mappa.*;
 import deadpixel.keystone.*;
 import processing.video.*;
+import KinectPV2.*;
 
 OffScreen off;
 Manager m;
@@ -18,6 +19,7 @@ void setup() {
 void draw() {
     background(0);
     c.basicCapture();
+    c.kinectColor();
     off.render();
 }
 void mouseClicked() {

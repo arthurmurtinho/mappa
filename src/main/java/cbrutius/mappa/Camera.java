@@ -2,6 +2,7 @@ package cbrutius.mappa;
 import processing.core.*;
 import processing.video.*;
 import java.util.ArrayList;
+import KinectPV2.*;
 
 import static processing.core.PConstants.P3D;
 
@@ -11,6 +12,7 @@ public class Camera extends Generator {
     ArrayList<PImage> frameBuffer;
     int frameCounter = 0;
     int directionSpeed = 1;
+    KinectPV2 kinect;
 
     public Camera(PApplet p) {
         super(p);
@@ -21,19 +23,30 @@ public class Camera extends Generator {
             c.start();
         }
         frameBuffer = new ArrayList<>();
+        this.kinectSetup();
         PApplet.printArray(Capture.list());
     }
 
-    public Camera(PApplet p, Capture cap) {
+    public Camera(PApplet p, Capture[] cap) {
         super(p);
         this.parent = this.p.createGraphics(this.p.width, this.p.height, P3D);
-        this.capture = new Capture[1];
-        this.capture[0] = cap;
+        this.capture = cap;
         for (Capture c : this.capture) {
             c.start();
         }
         frameBuffer = new ArrayList<>();
+        this.kinectSetup();
         PApplet.printArray(Capture.list());
+    }
+
+    private void kinectSetup() {
+        this.kinect = new KinectPV2(this.p);
+        this.kinect.enableColorImg(true);
+        this.kinect.enableBodyTrackImg(true);
+        this.kinect.enableDepthImg(true);
+        this.kinect.enableInfraredImg(true);
+        this.kinect.enableHDFaceDetection(true);
+        this.kinect.init();
     }
 
     public void basicCapture() {
@@ -43,6 +56,20 @@ public class Camera extends Generator {
             this.parent.image(this.capture[this.index], 0, 0, this.p.width, this.p.height);
             this.parent.endDraw();
         }
+    }
+
+    public void kinectColor() {
+        if (this.isShowing) {
+            this.parent.beginDraw();
+            this.parent.background(0, this.offscreen_alpha);
+            this.parent.image(kinect.getColorImage(), 0, 0, this.p.width, this.p.height);
+            this.parent.endDraw();
+        }
+    }
+
+
+    public void switchCamera() {
+        this.index = (this.index + 1) % Capture.list().length;
     }
 
     public void looper(float size, boolean loop, float velocity) {

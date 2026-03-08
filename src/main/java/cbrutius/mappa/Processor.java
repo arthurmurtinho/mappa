@@ -28,6 +28,7 @@ public class Processor {
     public void patch(PGraphics input) {
         this.parent = input;
     }
+
     /*
     process() is the soft equivalent of patch(). Instead of being a one-use method,
     it is invoked during draw, and continuously applies the effect on a PImage copy
