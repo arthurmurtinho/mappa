@@ -29,4 +29,8 @@ void mouseClicked() {
 
 void keyPressed() {
   m.keyControls();
+  switch(key) {
+    case '.': q.nextQuote();
+    break;
+  }
 }

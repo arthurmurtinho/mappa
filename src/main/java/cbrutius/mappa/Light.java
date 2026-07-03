@@ -35,6 +35,8 @@ public class Light extends Generator{
             this.parent.colorMode(PConstants.HSB);
             this.parent.background(this.h, this.s, this.b, this.alpha);
             this.parent.endDraw();
+        } else {
+            this.parent.background(0, this.alpha);
         }
     }
 
