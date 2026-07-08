@@ -109,6 +109,8 @@ dependencies {
     compileOnly(fileTree("$sketchbookLocation/libraries/video/library"))
     compileOnly(fileTree("$sketchbookLocation/libraries/keystone/library"))
     compileOnly(fileTree("$sketchbookLocation/libraries/KinectPV2/library"))
+    compileOnly(fileTree("$sketchbookLocation/libraries/oscP5/library"))
+    compileOnly(fileTree("$sketchbookLocation/libraries/spout/library"))
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

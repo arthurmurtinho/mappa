@@ -4,13 +4,37 @@ import processing.video.*;
 import java.util.ArrayList;
 import KinectPV2.*;
 import processing.core.PVector;
-
+import oscP5.*;            // Biblioteca OscP5
+import netP5.*;
+// Se estiver no Windows, use Spout. Se estiver no Mac, mude para Syphon (ex: codeanticode.syphon.*)
+import spout.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static processing.core.PApplet.*;
 import static processing.core.PConstants.*;
+import java.io.File;
+import java.io.IOException;
 
 public class Camera extends Generator {
+    public enum CameraMode {
+        KINECT,
+        LOCAL_WEBCAM,
+        NETWORK_STREAM // OSC + Spout/Syphon (MediaPipe externo)
+    }
+    private CameraMode mode;
+
+    private Process pythonProcess;
+
+    // Objetos para os diferentes modos
+    private Capture webcam;       // Usado no LOCAL_WEBCAM
+    private OscP5 oscP5;          // Usado no NETWORK_STREAM
+    private Spout spout; // Usado no NETWORK_STREAM (mude para SyphonClient se for Mac)
+
+    // Variáveis de tracking compartilhadas (expostas para a biblioteca usar)
+    public PVector targetPosition;
+    public ArrayList<PVector> points; // Útil para Face Mesh ou Mãos do MediaPipe
+
+
     Capture[] capture;
     int index = 0;
     ArrayList<PImage> frameBuffer;
@@ -23,30 +47,223 @@ public class Camera extends Generator {
     float smoothedY = 0;
     float lerpAmount = 0.15f;
 
-    public Camera(PApplet p) {
+    public Camera(PApplet p, CameraMode initialMode) {
         super(p);
+        this.mode = initialMode;
         this.parent = this.p.createGraphics(this.p.width, this.p.height, P3D);
-        this.capture = new Capture[1];
-        this.capture[0] = new Capture(this.p, 640, 480, "pipeline:autovideosrc"); //basic capture if none are passed;
-        for (Capture c : this.capture) {
-            c.start();
-        }
+        this.targetPosition = new PVector(0, 0, 0);
+        this.points = new ArrayList<PVector>();
+//        this.capture = new Capture[1];
+//        this.capture[0] = new Capture(this.p, 640, 480, "pipeline:autovideosrc"); //basic capture if none are passed;
+//        for (Capture c : this.capture) {
+//            c.start();
+//        }
         frameBuffer = new ArrayList<>();
-        this.kinectSetup();
+        initMode();
+        if (this.mode == CameraMode.NETWORK_STREAM) {
+            startPythonScript();
+        }
         PApplet.printArray(Capture.list());
+        this.p.registerMethod("dispose", this);
     }
 
     public Camera(PApplet p, Capture[] cap) {
         super(p);
+        this.mode = CameraMode.LOCAL_WEBCAM;
         this.parent = this.p.createGraphics(this.p.width, this.p.height, P3D);
-        this.capture = cap;
-        for (Capture c : this.capture) {
-            c.start();
-        }
+        this.targetPosition = new PVector(0, 0, 0);
+        this.points = new ArrayList<PVector>();
+//        this.capture = cap;
+//        for (Capture c : this.capture) {
+//            c.start();
+//        }
         frameBuffer = new ArrayList<>();
-        this.kinectSetup();
+        initMode();
+        if (this.mode == CameraMode.NETWORK_STREAM) {
+            startPythonScript();
+        }
         PApplet.printArray(Capture.list());
+        this.p.registerMethod("dispose", this);
     }
+
+    // Inicializa os recursos específicos de cada modo
+    private void initMode() {
+        switch (this.mode) {
+            case KINECT:
+                this.kinectSetup();
+                break;
+
+            case LOCAL_WEBCAM:
+                // Inicializa a câmera padrão do Processing
+//                String[] cameras = PApplet.platest(Capture.list());
+                int cameras = Capture.list().length;
+                if (cameras > 0) {
+                this.capture = new Capture[cameras];
+                for (Capture c : this.capture) {
+                    c.start();
+                }
+//                    this.webcam = new Capture(this.p, 640, 480, cameras[0]);
+                } else {
+                    PApplet.println("Nenhuma webcam local encontrada.");
+                }
+                break;
+
+            case NETWORK_STREAM:
+                // Inicializa o receptor OSC na porta 12000
+                this.oscP5 = new OscP5(this, 12000);
+
+                // Inicializa o receptor de vídeo Spout (para Windows)
+                this.spout = new Spout(this.p);
+                break;
+        }
+    }
+
+    // Método padrão do oscP5 que escuta pacotes da rede
+    public void oscEvent(OscMessage msg) {
+        if (this.mode != CameraMode.NETWORK_STREAM) return;
+
+        // Exemplo: Script Python envia as coordenadas principais em "/mediapipe/target"
+        if (msg.checkAddrPattern("/mediapipe/target")) {
+            this.targetPosition.x = msg.get(0).floatValue();
+            this.targetPosition.y = msg.get(1).floatValue();
+            if (msg.arguments().length > 2) {
+                this.targetPosition.z = msg.get(2).floatValue();
+            }
+        }
+
+        // Exemplo: Receber múltiplos pontos de uma mão ou face mesh
+        if (msg.checkAddrPattern("/mediapipe/points")) {
+            this.points.clear();
+            for (int i = 0; i < msg.arguments().length; i += 2) {
+                float px = msg.get(i).floatValue();
+                float py = msg.get(i+1).floatValue();
+                this.points.add(new PVector(px, py));
+            }
+        }
+    }
+
+    private void startPythonScript() {
+        try {
+            String scriptPath = this.p.sketchPath("data/mediapipe_tracker.py");
+
+            // 1. Tenta descobrir onde o Python está instalado no usuário atual do Windows
+            String userHome = System.getProperty("user.home");
+
+            // Caminhos mais comuns de instalação do Python no Windows
+            String[] possiblePythonPaths = {
+                    "py", // Atalho global oficial do instalador do Python
+                    "python3",
+                    userHome + "\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+                    userHome + "\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+                    userHome + "\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+                    "C:\\Python310\\python.exe",
+                    "C:\\Python311\\python.exe",
+                    "C:\\Python312\\python.exe",
+                    "python" // Deixa por último como fallback
+            };
+
+            ProcessBuilder pb = null;
+
+            // Loop para testar qual comando/caminho funciona na máquina atual
+            for (String pythonCmd : possiblePythonPaths) {
+                try {
+                    // Se for um caminho de arquivo, checa se o .exe realmente existe antes de tentar rodar
+                    if (pythonCmd.contains("\\") && !new File(pythonCmd).exists()) {
+                        continue;
+                    }
+
+                    // Tenta testar o comando executando um "python --version" rápido
+                    Process test = new ProcessBuilder(pythonCmd, "--version").start();
+                    int exitCode = test.waitFor();
+
+                    if (exitCode == 0) {
+                        // Achou um Python válido! Configura o ProcessBuilder final com ele
+                        PApplet.println("MAPPA: Executável do Python encontrado em: " + pythonCmd);
+                        pb = new ProcessBuilder(pythonCmd, scriptPath);
+                        break;
+                    }
+                } catch (Exception e) {
+                    // Avança para o próximo se este comando falhar
+                }
+            }
+
+            // Se nenhum dos caminhos automáticos funcionou, usa o "py" ou "python" padrão e deixa o erro estourar
+            if (pb == null) {
+                PApplet.println("MAPPA: Não foi possível detectar o Python automaticamente. Tentando comando padrão...");
+                pb = new ProcessBuilder("py", scriptPath);
+            }
+
+            // Redireciona os erros e saídas do Python para o console do IntelliJ
+            pb.redirectErrorStream(true);
+            pb.inheritIO();
+
+            PApplet.println("MAPPA: Inicializando rastreador MediaPipe em Python...");
+            this.pythonProcess = pb.start();
+
+        } catch (IOException e) {
+            PApplet.println("Erro crítico ao iniciar o script Python: " + e.getMessage());
+        }
+    }
+
+    public void run() {
+        this.parent.beginDraw();
+        this.parent.background(0, this.offscreen_alpha);
+
+        if (this.isShowing) {
+            switch (this.mode) {
+                case KINECT:
+                    // Desenha o feed do Kinect ou os esqueletos no parent
+                    // PImage kinectFrame = kinect.getColorImage();
+                    // this.parent.image(kinectFrame, 0, 0, this.parent.width, this.parent.height);
+                    break;
+
+                case LOCAL_WEBCAM:
+                    if (this.webcam != null && this.webcam.available()) {
+                        this.webcam.read();
+                        // Desenha o frame da webcam local direto no canvas offscreen do MAPPA
+                        this.parent.image(this.webcam, 0, 0, this.parent.width, this.parent.height);
+                    }
+                    break;
+
+                case NETWORK_STREAM:
+                    // Puxa o frame de vídeo transmitido pelo Python via Spout
+                    if (this.spout != null) {
+                        // Recebe a imagem diretamente dentro do PGraphics parent
+                        this.spout.receiveTexture(this.parent);
+                    }
+                    break;
+            }
+
+            // Opcional: Se quiser desenhar um feedback visual dos pontos rastreados na tela de projeção
+            /*
+            this.parent.fill(0, 255, 255);
+            this.parent.ellipse(this.targetPosition.x, this.targetPosition.y, 20, 20);
+            */
+        }
+
+        this.parent.endDraw();
+    }
+
+    // Método para permitir mudar o modo em tempo real (se necessário em uma live performance)
+    public void setMode(CameraMode newMode) {
+        // Encerra recursos antigos se necessário
+        if (this.mode == CameraMode.LOCAL_WEBCAM && this.webcam != null) {
+            this.webcam.stop();
+        }
+        if (this.mode == CameraMode.NETWORK_STREAM && this.oscP5 != null) {
+            this.oscP5.stop();
+        }
+
+        this.mode = newMode;
+        initMode();
+    }
+
+    public CameraMode getMode() {
+        return this.mode;
+    }
+
+
+
     /* This is the quick fix for the kinect in camera class. if
     the user doesn't import KinectPV2, it should handle the error instead of crashing the sketch
      */

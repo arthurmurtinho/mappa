@@ -94,6 +94,13 @@ public class Manager {
         p.saveJSONArray(bindings, "./data/bindings.json");
     }
 
+    public boolean isCalibrating() {
+        if (keystone.isCalibrating()) {
+            return true;
+        }
+        return false;
+    }
+
     public static void screenSetup(PApplet sa) {
         String[] args = {"Control_Screen"};
         PApplet.runSketch(args, sa);
