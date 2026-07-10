@@ -1,52 +1,64 @@
-// from ShaderToy: https://www.shadertoy.com/view/MlBSzR
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
 
-uniform vec2 iResolution;
+#define PROCESSING_TEXTURE_SHADER
+varying vec4 vertTexCoord;
+
 uniform sampler2D texture;
+uniform vec2 iResolution;
 
-#define iChannel0 texture
+// Parâmetros que vêm do Java
+uniform float iGlobalTime; // Para fazer o glitch mover-se sozinho
+uniform float intensity;   // O nosso slider universal (0.0 a 1.0)
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord );
-
-void main() {
-    mainImage(gl_FragColor,gl_FragCoord.xy);
+// Função matemática para gerar ruído analógico sem precisar de texturas externas
+float hash(vec2 p) {
+    float h = dot(p, vec2(127.1, 311.7));
+    return fract(sin(h) * 43758.5453123);
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-	vec2 uv = fragCoord.xy / iResolution.xy;
-//    uv.t = 1.0 - uv.t;
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+            mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
 
-    float x = uv.s;
-    float y = uv.t;
+void main() {
+    vec2 uv = vertTexCoord.st;
 
-    //
-    float glitchStrength = 800/iResolution.y * 5.0;
+    // Se a intensidade for 0, desenha a imagem limpa e sai do shader imediatamente
+    if (intensity <= 0.0) {
+        gl_FragColor = texture2D(texture, uv);
+        return;
+    }
 
-    // get snapped position
-    float psize = 0.04 * glitchStrength;
-    float psq = 1.0 / psize;
+    // Configura a escala do glitch baseada na nossa intensidade
+    float glitchBlockScale = 15.0;
+    float timeScale = iGlobalTime * 2.0;
 
-    float px = floor( x * psq + 0.5) * psize;
-    float py = floor( y * psq + 0.5) * psize;
+    // Gera linhas horizontais de distorção baseadas em ruído
+    float lineNoise = noise(vec2(uv.y * glitchBlockScale, timeScale));
 
-	vec4 colSnap = texture( iChannel0, vec2( px,py) );
+    // Cria um limite de corte (threshold). Quanto maior a intensidade, mais blocos falham
+    float threshold = 1.0 - (intensity * 0.6);
 
-	float lum = pow( 1.0 - (colSnap.r + colSnap.g + colSnap.b) / 3.0, glitchStrength ); // remove the minus one if you want to invert luma
+    if (lineNoise > threshold) {
+        // Aplica o deslocamento horizontal (Glitch)
+        float displacement = (hash(vec2(floor(uv.y * glitchBlockScale), timeScale)) - 0.5) * (intensity * 0.15);
+        uv.x = fract(uv.x + displacement);
 
-    // do move with lum as multiplying factor
-    float qsize = psize * lum;
+        // Pequena aberração cromática opcional nas partes afetadas para dar mais realismo
+        vec4 rCol = texture2D(texture, vec2(uv.x + 0.01 * intensity, uv.y));
+        vec4 gCol = texture2D(texture, uv);
+        vec4 bCol = texture2D(texture, vec2(uv.x - 0.01 * intensity, uv.y));
 
-    float qsq = 1.0 / qsize;
-
-    float qx = floor( x * qsq + 0.5) * qsize;
-    float qy = floor( y * qsq + 0.5) * qsize;
-
-    float rx = (px - qx) * lum + x;
-    float ry = (py - qy) * lum + y;
-
-	vec4 colMove = texture( iChannel0, vec2( rx,ry) );
-
-
-    // final color
-    fragColor = colMove;
+        gl_FragColor = vec4(rCol.r, gCol.g, bCol.b, 1.0);
+    } else {
+        // Desenha o pixel normal sem falha
+        gl_FragColor = texture2D(texture, uv);
+    }
 }

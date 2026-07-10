@@ -46,4 +46,12 @@ boolean isShowing = true;
         }
     }
 
+    public int getWidth() {
+        return this.pg.width;
+    }
+
+    public int getHeight() {
+        return this.pg.height;
+    }
+
 }

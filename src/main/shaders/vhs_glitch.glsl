@@ -1,77 +1,100 @@
-// from shadertoy https://www.shadertoy.com/view/ldjGzV
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
 
-uniform vec2 iResolution;
+#define PROCESSING_TEXTURE_SHADER
+varying vec4 vertTexCoord;
+
 uniform sampler2D texture;
+uniform vec2 iResolution;
+
+// Parâmetros independentes vindos do Java (0.0 a 1.0)
 uniform float iGlobalTime;
+uniform float glitchIntensity;
+uniform float noiseSuck;
+uniform float tubeCurvature;
 
-#define iChannel0 texture
-#define iChannel1 texture
+// Substituição da textura de ruído por uma função pseudo-aleatória matemática estável
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord );
+float noise(vec2 p) {
+    // Simula a leitura caótica temporal baseada no iGlobalTime
+    float s = hash(p + vec2(1.0, 2.0 * cos(iGlobalTime)) * iGlobalTime * 8.0);
+    s *= s;
+    return s;
+}
+
+float onOff(float a, float b, float c) {
+    // Amarra a probabilidade do pulo à intensidade do glitch do Java
+    return step(mix(0.95, c, glitchIntensity), sin(iGlobalTime + a * cos(iGlobalTime * b)));
+}
+
+float ramp(float y, float start, float end) {
+    float inside = step(start, y) - step(end, y);
+    float fact = (y - start) / (end - start) * inside;
+    return (1.0 - fact) * inside;
+}
+
+float stripes(vec2 uv) {
+    float noi = noise(uv * vec2(0.5, 1.0) + vec2(1.0, 3.0));
+    return ramp(mod(uv.y * 4.0 + iGlobalTime / 2.0 + sin(iGlobalTime + sin(iGlobalTime * 0.63)), 1.0), 0.5, 0.6) * noi;
+}
+
+vec3 getVideo(vec2 uv) {
+    vec2 look = uv;
+    float window = 1.0 / (1.0 + 20.0 * (look.y - mod(iGlobalTime / 4.0, 1.0)) * (look.y - mod(iGlobalTime / 4.0, 1.0)));
+
+    // Distorção horizontal rasgando a tela baseada no glitchIntensity
+    look.x = look.x + sin(look.y * 10.0 + iGlobalTime) / 50.0 * onOff(4.0, 4.0, 0.3) * (1.0 + cos(iGlobalTime * 80.0)) * window * glitchIntensity;
+
+    // Deslocamento vertical (pulo de tracking) baseado no glitchIntensity
+    float vShift = 0.4 * onOff(2.0, 3.0, 0.9) * (sin(iGlobalTime) * sin(iGlobalTime * 20.0) + (0.5 + 0.1 * sin(iGlobalTime * 200.0) * cos(iGlobalTime))) * glitchIntensity;
+    look.y = mod(look.y + vShift, 1.0);
+
+    return texture2D(texture, look).rgb;
+}
+
+vec2 screenDistort(vec2 uv) {
+    uv -= vec2(0.5, 0.5);
+    // Controla dinamicamente a curvatura esférica CRT baseado no uniform do Java
+    float distortFactor = mix(0.0, 2.0, tubeCurvature);
+    uv = uv * 1.2 * (1.0 / 1.2 + distortFactor * uv.x * uv.x * uv.y * uv.y);
+    uv += vec2(0.5, 0.5);
+    return uv;
+}
 
 void main() {
-    mainImage(gl_FragColor,gl_FragCoord.xy);
-}
+    vec2 uv = vertTexCoord.st;
 
-float noise(vec2 p)
-{
-	float s = texture(iChannel1,vec2(1.,2.*cos(iGlobalTime))*iGlobalTime*8. + p*1.).x;
-	s *= s;
-	return s;
-}
+    // 1. Aplica distorção geométrica de tubo
+    uv = screenDistort(uv);
 
-float onOff(float a, float b, float c)
-{
-	return step(c, sin(iGlobalTime + a*cos(iGlobalTime*b)));
-}
+    vec3 video = vec3(0.0);
 
-float ramp(float y, float start, float end)
-{
-	float inside = step(start,y) - step(end,y);
-	float fact = (y-start)/(end-start)*inside;
-	return (1.-fact) * inside;
+    // Garante estabilidade nas bordas da tela se curvar demais
+    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+        video = vec3(0.0);
+    } else {
+        // 2. Extrai o sinal de vídeo com glitches
+        video = getVideo(uv);
 
-}
+        // 3. Aplica os efeitos de vinheta e scanlines clássicos do ShaderToy original
+        float vigAmt = 3.0 + 0.3 * sin(iGlobalTime + 5.0 * cos(iGlobalTime * 5.0));
+        float vignette = (1.0 - vigAmt * (uv.y - 0.5) * (uv.y - 0.5)) * (1.0 - vigAmt * (uv.x - 0.5) * (uv.x - 0.5));
 
-float stripes(vec2 uv)
-{
+        // Adiciona as barras estáticas escaladas pelo noiseSuck
+        video += stripes(uv) * noiseSuck * 1.5;
+        video += (noise(uv * 2.0) / 2.0) * noiseSuck;
+        video *= vignette;
 
-	float noi = noise(uv*vec2(0.5,1.) + vec2(1.,3.));
-	return ramp(mod(uv.y*4. + iGlobalTime/2.+sin(iGlobalTime + sin(iGlobalTime*0.63)),1.),0.5,0.6)*noi;
-}
+        // Scanlines verticais dinâmicas
+        video *= (12.0 + mod(uv.y * 30.0 + iGlobalTime, 1.0)) / 13.0;
+    }
 
-vec3 getVideo(vec2 uv)
-{
-	vec2 look = uv;
-	float window = 1./(1.+20.*(look.y-mod(iGlobalTime/4.,1.))*(look.y-mod(iGlobalTime/4.,1.)));
-	look.x = look.x + sin(look.y*10. + iGlobalTime)/50.*onOff(4.,4.,.3)*(1.+cos(iGlobalTime*80.))*window;
-	float vShift = 0.4*onOff(2.,3.,.9)*(sin(iGlobalTime)*sin(iGlobalTime*20.) +
-										 (0.5 + 0.1*sin(iGlobalTime*200.)*cos(iGlobalTime)));
-	look.y = mod(look.y + vShift, 1.);
-	vec3 video = vec3(texture(iChannel0,look));
-	return video;
-}
-
-vec2 screenDistort(vec2 uv)
-{
-	uv -= vec2(.5,.5);
-	uv = uv*1.2*(1./1.2+2.*uv.x*uv.x*uv.y*uv.y);
-	uv += vec2(.5,.5);
-	return uv;
-}
-
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-	vec2 uv = fragCoord.xy / iResolution.xy;
-	uv = screenDistort(uv);
-	vec3 video = getVideo(uv);
-	float vigAmt = 3.+.3*sin(iGlobalTime + 5.*cos(iGlobalTime*5.));
-	float vignette = (1.-vigAmt*(uv.y-.5)*(uv.y-.5))*(1.-vigAmt*(uv.x-.5)*(uv.x-.5));
-
-	video += stripes(uv);
-	video += noise(uv*2.)/2.;
-	video *= vignette;
-	video *= (12.+mod(uv.y*30.+iGlobalTime,1.))/13.;
-
-	fragColor = vec4(video,1.0);
+    // Amostra o alfa original para manter transparências de superfícies
+    float alpha = texture2D(texture, vertTexCoord.st).a;
+    gl_FragColor = vec4(video, alpha);
 }
