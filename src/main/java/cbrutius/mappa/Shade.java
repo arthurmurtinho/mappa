@@ -16,6 +16,16 @@ public class Shade extends Processor{
     }
 
     /**
+     * Reseta o shader, deixando a imagem passar limpa
+     */
+    public void bypass() {
+        parent.beginDraw();
+        parent.resetShader();
+        parent.endDraw();
+        this.loaded = false;
+    }
+
+    /**
      * Aplica o efeito de texto ASCII sobre a superfície
      * @param res Valor entre 0.0 (caracteres bem pequenos/alta definição) e 1.0 (caracteres gigantes/super pixelado)
      */
